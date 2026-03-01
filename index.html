@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Banana</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F5E642;
+    --black: #080808;
+    --white: #F0EEE8;
+    --grey: #1a1a1a;
+    --mid: #2e2e2e;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; cursor: none; }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--yellow);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(245,230,66,0.5);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.2s ease, height 0.2s ease;
+  }
+
+  /* ===================== LANDING PAGE ===================== */
+  #landing {
+    width: 100vw; height: 100vh;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .half {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition: width 0.6s cubic-bezier(0.77,0,0.18,1);
+    overflow: hidden;
+  }
+
+  .half-left {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  .half-right {
+    background: var(--black);
+    color: var(--white);
+    cursor: none;
+  }
+
+  .half:hover { width: 55%; }
+  .half:hover ~ .half, .half ~ .half:hover { width: 45%; }
+
+  /* noise texture overlay */
+  .half::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .half-right::after {
+    content: '';
+    position: absolute;
+    top: -20%; left: -20%;
+    width: 140%; height: 140%;
+    background: radial-gradient(ellipse at 60% 40%, rgba(245,230,66,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* DIVIDER LINE */
+  .divider {
+    position: absolute;
+    left: 50%; top: 0;
+    width: 1px; height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--yellow), transparent);
+    z-index: 10;
+    transform: translateX(-50%);
+  }
+
+  /* COMBINED LOGO */
+  .combined-logo {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .logo-half-left {
+    width: 52px; height: 70px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .logo-half-right {
+    width: 52px; height: 70px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* SVG logo halves */
+  .logo-svg {
+    width: 104px; height: 70px;
+    position: absolute;
+    top: 0;
+  }
+
+  .logo-half-left .logo-svg { left: 0; }
+  .logo-half-right .logo-svg { right: 0; }
+
+  /* LEFT half: blocky angular ">" shape in black on white bg */
+  .logo-left-shape {
+    fill: var(--black);
+  }
+  /* RIGHT half: sleek pointed shape in white/yellow on dark bg */
+  .logo-right-shape {
+    fill: var(--yellow);
+  }
+
+  /* BRAND LABELS */
+  .brand-label {
+    position: absolute;
+    bottom: 12%;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    z-index: 5;
+    transition: opacity 0.3s;
+  }
+
+  .half-left .brand-label { color: var(--black); left: 50%; transform: translateX(-50%); }
+  .half-right .brand-label { color: var(--white); right: 50%; transform: translateX(50%); }
+  .half:hover .brand-label { opacity: 0.9; }
+
+  /* BIG TYPOGRAPHIC BACKGROUND TEXT */
+  .bg-text {
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(100px, 18vw, 220px);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    z-index: 2;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .half-left .bg-text {
+    color: rgba(8,8,8,0.06);
+    bottom: 8%;
+    left: -5%;
+  }
+
+  .half-right .bg-text {
+    color: rgba(240,238,232,0.04);
+    bottom: 8%;
+    right: -5%;
+  }
+
+  /* ENTER ATHLETICS CTA */
+  .enter-cta {
+    position: absolute;
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--white);
+  }
+
+  .enter-cta .cta-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 4vw, 52px);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    transition: color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .enter-cta .cta-label span.highlight {
+    color: var(--yellow);
+  }
+
+  .enter-cta .cta-arrow {
+    width: 40px; height: 1px;
+    background: var(--yellow);
+    transition: width 0.3s ease;
+    position: relative;
+  }
+
+  .enter-cta .cta-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0; top: -3px;
+    width: 7px; height: 7px;
+    border-right: 1px solid var(--yellow);
+    border-top: 1px solid var(--yellow);
+    transform: rotate(45deg);
+  }
+
+  .enter-cta:hover .cta-arrow { width: 70px; }
+  .enter-cta:hover .cta-label { color: var(--yellow); }
+
+  /* LEFT brand text */
+  .brand-text-left {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+    z-index: 15;
+    color: var(--black);
+  }
+
+  .brand-text-left .main-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 4vw, 52px);
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  .brand-text-left .sub {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    font-family: 'Space Mono', monospace;
+    margin-top: 6px;
+  }
+
+  /* SCAN LINES on right side */
+  .scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.012) 2px,
+      rgba(255,255,255,0.012) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* ===================== ATHLETICS PAGE ===================== */
+  #athletics {
+    display: none;
+    min-height: 100vh;
+    background: var(--black);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 100;
+    background: rgba(8,8,8,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.12em;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-logo .x-mark {
+    color: var(--yellow);
+    font-size: 22px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(240,238,232,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover, .nav-links a.active { color: var(--yellow); }
+
+  .nav-right {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .back-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(240,238,232,0.4);
+    background: none;
+    border: 1px solid rgba(240,238,232,0.15);
+    padding: 6px 14px;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { color: var(--yellow); border-color: var(--yellow); }
+
+  /* HERO */
+  .athletics-hero {
+    padding-top: 64px;
+    height: 85vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .hero-text-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 50px;
+    position: relative;
+    z-index: 5;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--yellow);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 8vw, 110px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    margin-bottom: 24px;
+  }
+
+  .hero-title .outline {
+    -webkit-text-stroke: 1px var(--white);
+    color: transparent;
+  }
+
+  .hero-title .yellow { color: var(--yellow); }
+
+  .hero-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(240,238,232,0.5);
+    max-width: 360px;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--yellow);
+    color: var(--black);
+    padding: 14px 28px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s, gap 0.2s;
+    width: fit-content;
+  }
+
+  .hero-cta:hover { background: var(--white); gap: 24px; }
+
+  .hero-image-panel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-image-panel img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    filter: contrast(1.05) saturate(0.8);
+  }
+
+  .hero-image-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--black) 0%, transparent 30%),
+                linear-gradient(to top, rgba(8,8,8,0.6) 0%, transparent 40%);
+  }
+
+  .hero-counter {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: rgba(240,238,232,0.3);
+    z-index: 10;
+  }
+
+  /* TICKER */
+  .ticker {
+    background: var(--yellow);
+    color: var(--black);
+    height: 36px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ticker-inner {
+    display: flex;
+    animation: ticker 22s linear infinite;
+    gap: 0;
+  }
+
+  .ticker-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .ticker-item::after {
+    content: '×';
+    opacity: 0.4;
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    padding: 32px 40px 0;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .filter-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(240,238,232,0.35);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0 0 16px 0;
+    margin-right: 32px;
+    cursor: none;
+    transition: all 0.2s;
+  }
+
+  .filter-btn.active, .filter-btn:hover {
+    color: var(--white);
+    border-bottom-color: var(--yellow);
+  }
+
+  /* PRODUCT GRID */
+  .product-section {
+    padding: 40px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.1em;
+    color: var(--white);
+  }
+
+  .section-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: rgba(240,238,232,0.3);
+    text-transform: uppercase;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+
+  /* WIDE BANNER ITEM */
+  .product-grid .wide {
+    grid-column: span 2;
+  }
+
+  .product-card {
+    position: relative;
+    background: var(--grey);
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    cursor: none;
+  }
+
+  .wide.product-card {
+    aspect-ratio: 3/2;
+  }
+
+  .product-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.4s;
+    filter: saturate(0.75) contrast(1.05);
+  }
+
+  .product-card:hover img {
+    transform: scale(1.04);
+    filter: saturate(0.9) contrast(1.1);
+  }
+
+  .product-card .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, transparent 55%);
+    z-index: 2;
+    transition: opacity 0.3s;
+  }
+
+  .product-card:hover .overlay {
+    background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.2) 55%);
+  }
+
+  .product-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 20px;
+    z-index: 3;
+    transform: translateY(4px);
+    transition: transform 0.3s;
+  }
+
+  .product-card:hover .product-info { transform: translateY(0); }
+
+  .product-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .product-prices {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .price-new {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--yellow);
+  }
+
+  .price-old {
+    font-size: 11px;
+    color: rgba(240,238,232,0.3);
+    text-decoration: line-through;
+  }
+
+  .discount-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    background: var(--yellow);
+    color: var(--black);
+    padding: 2px 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .sold-out-badge {
+    position: absolute;
+    top: 14px; left: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: rgba(8,8,8,0.8);
+    color: rgba(240,238,232,0.5);
+    border: 1px solid rgba(240,238,232,0.2);
+    padding: 4px 8px;
+    z-index: 4;
+  }
+
+  .add-btn {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 34px; height: 34px;
+    background: rgba(8,8,8,0.7);
+    border: 1px solid rgba(240,238,232,0.15);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 4;
+    cursor: none;
+    transition: all 0.2s;
+    opacity: 0;
+  }
+
+  .product-card:hover .add-btn { opacity: 1; }
+  .add-btn:hover { background: var(--yellow); border-color: var(--yellow); }
+  .add-btn:hover svg { stroke: var(--black); }
+
+  .add-btn svg { width: 14px; height: 14px; stroke: var(--white); fill: none; stroke-width: 1.5; }
+
+  /* COLOR SWATCHES */
+  .swatches {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .product-card:hover .swatches { opacity: 1; }
+  .swatch {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* PROMO BANNER */
+  .promo-banner {
+    grid-column: span 2;
+    background: var(--yellow);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+    aspect-ratio: 3/2;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .promo-banner::before {
+    content: 'XATHLETICS';
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    color: rgba(8,8,8,0.08);
+    position: absolute;
+    bottom: -10px; right: -10px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .promo-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(8,8,8,0.5);
+    margin-bottom: 8px;
+  }
+
+  .promo-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: var(--black);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .promo-code {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-top: 60px;
+  }
+
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.1em;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .footer-brand span { color: var(--yellow); }
+
+  .footer-tagline {
+    font-size: 11px;
+    color: rgba(240,238,232,0.3);
+    line-height: 1.6;
+    max-width: 200px;
+  }
+
+  .footer-heading {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(240,238,232,0.4);
+    margin-bottom: 16px;
+  }
+
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-links a {
+    font-size: 12px;
+    color: rgba(240,238,232,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .footer-links a:hover { color: var(--yellow); }
+
+  .footer-bottom {
+    padding: 20px 40px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-bottom p {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: rgba(240,238,232,0.2);
+    text-transform: uppercase;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.35s; }
+  .delay-4 { animation-delay: 0.5s; }
+
+  /* PAGE TRANSITION */
+  .page-transition {
+    position: fixed;
+    inset: 0;
+    background: var(--yellow);
+    z-index: 1000;
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+
+  .page-transition.active {
+    animation: wipe 0.7s cubic-bezier(0.77,0,0.18,1) forwards;
+  }
+
+  @keyframes wipe {
+    0% { transform: translateX(-100%); }
+    45% { transform: translateX(0); }
+    55% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="page-transition" id="transition"></div>
+
+<!-- ===== LANDING PAGE ===== -->
+<div id="landing">
+
+  <div class="half half-left fade-up">
+    <div class="scanlines" style="opacity:0.02;"></div>
+    <div class="bg-text">BLUE<br>BANANA</div>
+
+    <div class="brand-text-left fade-up delay-2">
+      <div class="main-name">BLUE<br>BANANA</div>
+      <div class="sub">Est. 2014 · BCN</div>
+    </div>
+
+    <span class="brand-label">Core Collection</span>
+  </div>
+
+  <!-- DIVIDER + COMBINED LOGO -->
+  <div class="divider"></div>
+  <div class="combined-logo fade-up delay-3">
+    <!-- Left half: blocky angular shape (like ">|") -->
+    <div class="logo-half-left">
+      <svg class="logo-svg" viewBox="0 0 104 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Blocky angular > shape, clipped to left half -->
+        <polygon points="10,5 52,35 10,65 22,65 64,35 22,5" fill="#080808"/>
+      </svg>
+    </div>
+    <!-- Right half: sleek pointed shape (like "|<") -->
+    <div class="logo-half-right">
+      <svg class="logo-svg" viewBox="0 0 104 70" fill="none" xmlns="http://www.w3.org/2000/svg" style="right:0;left:auto;">
+        <!-- Sleek pointed shape mirrored, clipped to right half -->
+        <polygon points="94,5 52,35 94,65 82,65 40,35 82,5" fill="#F5E642"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="half half-right fade-up delay-1">
+    <div class="scanlines"></div>
+    <div class="bg-text" style="right:-5%;left:auto;">X<br>ATHLETICS</div>
+
+    <a href="#" class="enter-cta" id="enterAthletics">
+      <div class="cta-label">
+        X<span class="highlight">ATHLETICS</span>
+      </div>
+      <div class="cta-arrow"></div>
+    </a>
+
+    <span class="brand-label" style="right:50%;transform:translateX(50%)">Performance Line</span>
+  </div>
+
+</div>
+
+
+<!-- ===== ATHLETICS PAGE ===== -->
+<div id="athletics">
+
+  <nav>
+    <a href="#" class="nav-logo" id="backToLanding">
+      <span class="x-mark">X</span>ATHLETICS
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" class="active">All</a></li>
+      <li><a href="#">Men</a></li>
+      <li><a href="#">Women</a></li>
+      <li><a href="#">New In</a></li>
+      <li><a href="#">Sale</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="back-btn" id="backBtn">← Main Site</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="athletics-hero">
+    <div class="hero-text-panel">
+      <div class="hero-eyebrow fade-up">New Season · 2025</div>
+      <h1 class="hero-title fade-up delay-1">
+        BUILT<br>
+        <span class="outline">FOR</span><br>
+        <span class="yellow">MOTION</span>
+      </h1>
+      <p class="hero-desc fade-up delay-2">Performance engineered for those who push limits. Urban aesthetics meet technical construction.</p>
+      <a href="#catalog" class="hero-cta fade-up delay-3">
+        Shop Collection
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M0 5H14M10 1L14 5L10 9" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+    </div>
+    <div class="hero-image-panel">
+      <!-- Using a placeholder gradient since we can't load external images without CORS -->
+      <div style="width:100%;height:100%;background:linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 50%, #111 100%);display:flex;align-items:center;justify-content:center;position:relative;">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%, rgba(245,230,66,0.08) 0%, transparent 60%);"></div>
+        <div style="text-align:center;z-index:2;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:rgba(245,230,66,0.12);letter-spacing:-0.02em;line-height:1;">X</div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.4em;color:rgba(240,238,232,0.2);text-transform:uppercase;margin-top:-20px;">XATHLETICS</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-counter">001 / 004</div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item">Free Returns & Exchanges</span>
+      <span class="ticker-item">Up to 60% Off Sale</span>
+      <span class="ticker-item">New Season 2025</span>
+      <span class="ticker-item">Performance Collection</span>
+      <span class="ticker-item">Code: EXTRA10 for 10% More</span>
+      <span class="ticker-item">Free Returns & Exchanges</span>
+      <span class="ticker-item">Up to 60% Off Sale</span>
+      <span class="ticker-item">New Season 2025</span>
+      <span class="ticker-item">Performance Collection</span>
+      <span class="ticker-item">Code: EXTRA10 for 10% More</span>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Tops</button>
+    <button class="filter-btn">Bottoms</button>
+    <button class="filter-btn">Outerwear</button>
+    <button class="filter-btn">Accessories</button>
+  </div>
+
+  <!-- PRODUCT GRID -->
+  <div class="product-section" id="catalog">
+    <div class="section-header">
+      <div class="section-title">XATHLETICS — AW25</div>
+      <div class="section-count">24 Items</div>
+    </div>
+
+    <div class="product-grid">
+
+      <!-- Product 1 -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#e8e6e0 0%,#d0cec8 100%);display:flex;align-items:flex-start;justify-content:center;padding-top:20px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.3em;color:rgba(8,8,8,0.15);margin-top:30px;">WHITE HALF ZIP</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">White In Half Zip Crew</div>
+          <div class="product-prices">
+            <span class="price-new">23,90€</span>
+            <span class="price-old">59,90€</span>
+            <span class="discount-badge">-60%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#e8e6e0;"></div>
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#111 0%,#0a0a0a 100%);display:flex;align-items:flex-start;justify-content:center;padding-top:20px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.3em;color:rgba(240,238,232,0.08);margin-top:30px;">TRAIN HOODIE</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">Black Train Hoodie</div>
+          <div class="product-prices">
+            <span class="price-new">27,90€</span>
+            <span class="price-old">69,90€</span>
+            <span class="discount-badge">-60%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promo Banner -->
+      <div class="promo-banner">
+        <div class="promo-tag">Limited Time Offer</div>
+        <div class="promo-big">10% EXTRA</div>
+        <div class="promo-code">USE CODE: EXTRA10</div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a1a1a 0%,#0d0d0d 100%);display:flex;align-items:center;justify-content:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.3em;color:rgba(240,238,232,0.08);">TRAIL SHORTS</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">Dark Grey Trail Shorts</div>
+          <div class="product-prices">
+            <span class="price-new">21,90€</span>
+            <span class="price-old">44,90€</span>
+            <span class="discount-badge">-51%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#333;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 4: SOLD OUT -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#0d0d0d 0%,#111 100%);display:flex;align-items:center;justify-content:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.3em;color:rgba(240,238,232,0.06);">CLUB LS TEE</div>
+        </div>
+        <div class="overlay"></div>
+        <span class="sold-out-badge">Sold Out</span>
+        <div class="product-info">
+          <div class="product-name">Black Club LS Tee</div>
+          <div class="product-prices">
+            <span class="price-new" style="color:rgba(240,238,232,0.4);">20,90€</span>
+            <span class="price-old">34,90€</span>
+            <span class="discount-badge" style="background:rgba(240,238,232,0.1);color:rgba(240,238,232,0.4);">-40%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#e8e6e0;"></div>
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 5 -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#e8e6e0 0%,#d0cec8 100%);display:flex;align-items:center;justify-content:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.3em;color:rgba(8,8,8,0.12);">WHITE LS TEE</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">White Club LS Tee</div>
+          <div class="product-prices">
+            <span class="price-new">16,90€</span>
+            <span class="price-old">34,90€</span>
+            <span class="discount-badge">-51%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#e8e6e0;"></div>
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 6 -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#e84400 0%,#cc3300 100%);display:flex;align-items:center;justify-content:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.3em;color:rgba(8,8,8,0.15);">TRAIN SHORTS</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">Orange Train Shorts</div>
+          <div class="product-prices">
+            <span class="price-new">15,90€</span>
+            <span class="price-old">39,90€</span>
+            <span class="discount-badge">-60%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#ccc;"></div>
+            <div class="swatch" style="background:#e84400;"></div>
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 7: Wide - Black Train Tee -->
+      <div class="product-card wide">
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+          <!-- Big X graphic -->
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:300px;color:rgba(240,238,232,0.04);position:absolute;line-height:1;">X</div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.5em;color:rgba(240,238,232,0.15);text-transform:uppercase;z-index:2;">xathletics</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">Black Train Tee — Signature Back Print</div>
+          <div class="product-prices">
+            <span class="price-new">15,90€</span>
+            <span class="price-old">32,90€</span>
+            <span class="discount-badge">-51%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#e8e6e0;"></div>
+            <div class="swatch" style="background:#555;"></div>
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 8 -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#111 0%,#0d0d0d 100%);display:flex;align-items:center;justify-content:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.3em;color:rgba(240,238,232,0.07);text-align:center;">WINDBREAKER</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">Black Out Windbreaker</div>
+          <div class="product-prices">
+            <span class="price-new">59,90€</span>
+            <span class="price-old">99,90€</span>
+            <span class="discount-badge">-40%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 9 -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#111 0%,#1a1a1a 100%);display:flex;align-items:center;justify-content:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.3em;color:rgba(240,238,232,0.07);text-align:center;">BLACK HALF ZIP</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">Black In Half Zip Crew</div>
+          <div class="product-prices">
+            <span class="price-new">29,90€</span>
+            <span class="price-old">59,90€</span>
+            <span class="discount-badge">-50%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#e8e6e0;"></div>
+            <div class="swatch" style="background:#111;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 10: Socks -->
+      <div class="product-card">
+        <div style="width:100%;height:100%;background:linear-gradient(160deg,#d5d3cd 0%,#c0beb8 100%);display:flex;align-items:center;justify-content:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:0.3em;color:rgba(8,8,8,0.15);text-align:center;">GRADIENT SOCKS</div>
+        </div>
+        <div class="overlay"></div>
+        <button class="add-btn">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </button>
+        <div class="product-info">
+          <div class="product-name">White Gradient Socks</div>
+          <div class="product-prices">
+            <span class="price-new">6,90€</span>
+            <span class="price-old">14,90€</span>
+            <span class="discount-badge">-53%</span>
+          </div>
+          <div class="swatches">
+            <div class="swatch" style="background:#e8e6e0;"></div>
+            <div class="swatch" style="background:#555;"></div>
+            <div class="swatch" style="background:#e84400;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="footer-brand">X<span>ATHLETICS</span></div>
+      <p class="footer-tagline">Performance built for the urban athlete. Push limits, look sharp.</p>
+    </div>
+    <div>
+      <div class="footer-heading">Collection</div>
+      <ul class="footer-links">
+        <li><a href="#">Men</a></li>
+        <li><a href="#">Women</a></li>
+        <li><a href="#">Athletics</a></li>
+        <li><a href="#">New In</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Info</div>
+      <ul class="footer-links">
+        <li><a href="#">About</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Size Guide</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Follow</div>
+      <ul class="footer-links">
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="#">YouTube</a></li>
+      </ul>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <p>© 2025 Blue Banana Brand — Xathletics Division</p>
+    <p>Consulting Project · Educational Use Only</p>
+  </div>
+
+</div>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Page transition
+  const transition = document.getElementById('transition');
+
+  function goToAthletics() {
+    transition.classList.add('active');
+    setTimeout(() => {
+      document.getElementById('landing').style.display = 'none';
+      document.getElementById('athletics').style.display = 'block';
+      window.scrollTo(0,0);
+    }, 350);
+    setTimeout(() => transition.classList.remove('active'), 750);
+  }
+
+  function goToLanding() {
+    transition.classList.add('active');
+    setTimeout(() => {
+      document.getElementById('athletics').style.display = 'none';
+      document.getElementById('landing').style.display = 'flex';
+      window.scrollTo(0,0);
+    }, 350);
+    setTimeout(() => transition.classList.remove('active'), 750);
+  }
+
+  document.getElementById('enterAthletics').addEventListener('click', e => {
+    e.preventDefault();
+    goToAthletics();
+  });
+
+  document.getElementById('backBtn').addEventListener('click', e => {
+    e.preventDefault();
+    goToLanding();
+  });
+
+  document.getElementById('backToLanding').addEventListener('click', e => {
+    e.preventDefault();
+    goToLanding();
+  });
+
+  // Filter bar
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
